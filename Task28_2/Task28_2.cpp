@@ -36,10 +36,13 @@ public:
 			travelTime--;
 			if (travelTime == 0)
 			{
-				printOut.lock();
-				std::cout << "Train " << name << " is waiting" << std::endl;
-				printOut.unlock();
-				expectation.lock();
+				if (!expectation.try_lock()) {
+					printOut.lock();
+					std::cout << "Train " << name << " is waiting" << std::endl;
+					printOut.unlock();
+					expectation.lock();
+				}
+				
 				std::cout << "Train " << name << " has arrived at the station" << std::endl;
 				std::cout << "To depart the train, enter : depart - " << std::endl;
 				std::cin >> command;
